@@ -11,39 +11,38 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import java.util.Optional;
-
 
 public class EndGame {
     private static EndGame singleInstance = null;
-    private EndGame(){
 
+    private EndGame() {
     }
-    public static EndGame getInstance(){
-        if(singleInstance == null)
-            singleInstance= new EndGame();
+
+    public static EndGame getInstance() {
+        if (singleInstance == null)
+            singleInstance = new EndGame();
         return singleInstance;
     }
 
-    public void endGameShow(Scene endGameScene, Group root, Stage primaryStage,long score){
-        Text text = new Text("GAME OVER");
-        text.relocate(250,250);
-        text.setFont(Font.font(80));
-        root.getChildren().add(text);
+    public void endGameShow(Scene endGameScene, Group root, Stage primaryStage, long score) {
+        Text gameOverText = new Text("GAME OVER");
+        gameOverText.relocate(250, 250);
+        gameOverText.setFont(Font.font(80));
+        root.getChildren().add(gameOverText);
 
-
-        Text scoreText = new Text(score+"");
+        Text scoreText = new Text(score + "");
         scoreText.setFill(Color.BLACK);
-        scoreText.relocate(250,600);
+        scoreText.relocate(250, 600);
         scoreText.setFont(Font.font(80));
         root.getChildren().add(scoreText);
 
         Button quitButton = new Button("QUIT");
-        quitButton.setPrefSize(100,30);
+        quitButton.setPrefSize(100, 30);
         quitButton.setTextFill(Color.PINK);
         root.getChildren().add(quitButton);
-        quitButton.relocate(100,800);
+        quitButton.relocate(100, 800);
+
         quitButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -51,15 +50,11 @@ public class EndGame {
                 alert.setTitle("Quit Dialog");
                 alert.setHeaderText("Quit from this page");
                 alert.setContentText("Are you sure?");
-
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK){
                     root.getChildren().clear();
                 }
             }
         });
-
-
-
     }
 }

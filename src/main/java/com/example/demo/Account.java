@@ -1,22 +1,41 @@
 package com.example.demo;
 
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 public class Account implements Comparable<Account> {
     private long score = 0;
-    private String userName ;
+    private String userName;
     private static ArrayList<Account> accounts = new ArrayList<>();
+    private static Account singleInstance = null;
 
-    public Account(String userName){
-        this.userName=userName;
+    public Account(String userName) {
+        this.userName = Objects.requireNonNull(userName, "Username cannot be null");
+    }
+
+    // Singleton pattern - no parameters
+    public static Account getInstance() {
+        if (singleInstance == null) {
+            singleInstance = new Account("DefaultPlayer");
+        }
+        return singleInstance;
+    }
+
+    // Parameterized method for creating specific accounts
+    public static Account getInstance(String userName) {
+        for (Account account : accounts) {
+            if (account.getUserName().equals(userName)) {
+                return account;
+            }
+        }
+        Account account = new Account(userName);
+        accounts.add(account);
+        return account;
     }
 
     @Override
@@ -28,28 +47,13 @@ public class Account implements Comparable<Account> {
         this.score += score;
     }
 
-    private long getScore() {
+    public long getScore() {
         return score;
     }
 
-    private String getUserName() {
+    public String getUserName() {
         return userName;
     }
 
-    static Account accountHaveBeenExist(String userName){
-        for(Account account : accounts){
-            if(account.getUserName().equals(userName)){
-                return account;
-            }
-        }
-        return null;
-
-    }
-
-    static Account makeNewAccount(String userName){
-        Account account = new Account(userName);
-        accounts.add(account);
-        return account;
-    }
-
+    // ... rest of your Account methods
 }

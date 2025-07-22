@@ -5,45 +5,29 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-class TextMaker {
-    private static TextMaker singleInstance = null;
+public class TextMaker {
+    private static final TextMaker INSTANCE = new TextMaker();
+    private static final double BASE_FONT_SIZE = 24;
 
-    private TextMaker() {
+    private TextMaker() {}
 
+    public static TextMaker getInstance() {
+        return INSTANCE;
     }
 
-    static TextMaker getSingleInstance() {
-        if (singleInstance == null)
-            singleInstance = new TextMaker();
-        return singleInstance;
-    }
-
-    Text madeText(String input, double xCell, double yCell, Group root) {
-        double length = GameScene.getLENGTH();
-        double fontSize = (3 * length) / 7.0;
-        Text text = new Text(input);
-        text.setFont(Font.font(fontSize));
-        text.relocate((xCell + (1.2)* length / 7.0), (yCell + 2 * length / 7.0));
+    public Text createText(String content, double x, double y, Group root) {
+        Text text = new Text(content);
+        text.setFont(Font.font(BASE_FONT_SIZE));
         text.setFill(Color.WHITE);
-
+        text.setX(x);
+        text.setY(y);
+        root.getChildren().add(text);
         return text;
     }
 
-    static void changeTwoText(Text first, Text second) {
-        String temp;
-        temp = first.getText();
-        first.setText(second.getText());
-        second.setText(temp);
-
-        double tempNumber;
-        tempNumber = first.getX();
-        first.setX(second.getX());
-        second.setX(tempNumber);
-
-        tempNumber = first.getY();
-        first.setY(second.getY());
-        second.setY(tempNumber);
-
+    public void updateText(Text text, String content, double x, double y) {
+        text.setText(content);
+        text.setX(x);
+        text.setY(y);
     }
-
 }
