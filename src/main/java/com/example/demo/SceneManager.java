@@ -1,5 +1,6 @@
 package com.example.demo;
 
+
 import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -7,16 +8,17 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 public class SceneManager {
     private Stage primaryStage;
     private Scene mainMenuScene;
     private Scene accountScene;
     private Scene leaderboardScene;
     private Scene gameScene;
+    private Main mainApp;  // Reference to Main app
 
-    public SceneManager(Stage primaryStage) {
+    public SceneManager(Stage primaryStage, Main mainApp) {
         this.primaryStage = primaryStage;
+        this.mainApp = mainApp;
         setupDefaultScenes();
     }
 
@@ -30,12 +32,10 @@ public class SceneManager {
 
     private Scene createSceneWithContent(String name) {
         Group root = new Group();
-
         // Background
         Rectangle background = new Rectangle(900, 900);
         background.setFill(Color.rgb(189, 177, 92));
         root.getChildren().add(background);
-
         // Title
         Text title = new Text(name);
         title.setFont(Font.font(48));
@@ -43,13 +43,11 @@ public class SceneManager {
         title.setX(350);
         title.setY(100);
         root.getChildren().add(title);
-
         return new Scene(root, 900, 900);
     }
 
     public void showMainMenu() {
         System.out.println("Showing main menu...");
-        // Create a new MainMenuView each time to ensure fresh UI
         MainMenuView mainMenuView = new MainMenuView(this);
         primaryStage.setScene(new Scene(mainMenuView.getRoot(), 900, 900));
         System.out.println("Main menu shown");
@@ -70,9 +68,6 @@ public class SceneManager {
     }
 
     public void showGame() {
-        System.out.println("Switching to game scene");
-        GameView gameView = new GameView();
-        primaryStage.setScene(new Scene(gameView, 900, 900));
-        System.out.println("Game scene shown");
+        mainApp.showGame();  // Use the Main app's showGame method
     }
 }

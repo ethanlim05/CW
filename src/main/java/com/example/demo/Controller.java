@@ -21,7 +21,6 @@ public class Controller {
 
     private void handleKeyPress(KeyEvent event) {
         if (gameModel.isGameOver()) return;
-
         KeyCode code = event.getCode();
         boolean moved = false;
 
@@ -38,7 +37,6 @@ public class Controller {
         if (moved) {
             gameModel.addRandomTile();
             updateView();
-
             if (gameModel.isGameOver()) {
                 sceneManager.showMainMenu();
             }
@@ -46,8 +44,7 @@ public class Controller {
     }
 
     private void updateView() {
-        gameView.updateBoard(gameModel.getBoard());
-        gameView.updateScore(gameModel.getScore());
-        gameView.updateGameState(gameModel.isGameOver());
+        gameView.updateBoard();  // Fixed: No parameters needed
+        gameView.updateScoreDisplay();  // Fixed: Use correct method name
     }
 }

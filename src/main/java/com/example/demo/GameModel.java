@@ -1,9 +1,12 @@
 package com.example.demo;
 
+
+import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Arrays;  // Add this import for Arrays.equals()
 
 public class GameModel {
     private long score = 0;
@@ -26,73 +29,13 @@ public class GameModel {
         addRandomTile();
     }
 
-    public boolean moveUp() {
-        boolean moved = false;
-        for (int col = 0; col < 4; col++) {
-            for (int row = 1; row < 4; row++) {
-                if (board[row][col] != 0) {
-                    int newPos = findNewPositionUp(row, col);
-                    if (newPos != row) {
-                        if (board[newPos][col] == 0) {
-                            board[newPos][col] = board[row][col];
-                            board[row][col] = 0;
-                            moved = true;
-                        } else if (board[newPos][col] == board[row][col]) {
-                            board[newPos][col] *= 2;
-                            addScore(board[newPos][col]);
-                            board[row][col] = 0;
-                            moved = true;
-                        }
-                    }
-                }
-            }
-        }
-        return moved;
-    }
-
-    public boolean moveDown() {
-        boolean moved = false;
-        for (int col = 0; col < 4; col++) {
-            for (int row = 2; row >= 0; row--) {
-                if (board[row][col] != 0) {
-                    int newPos = findNewPositionDown(row, col);
-                    if (newPos != row) {
-                        if (board[newPos][col] == 0) {
-                            board[newPos][col] = board[row][col];
-                            board[row][col] = 0;
-                            moved = true;
-                        } else if (board[newPos][col] == board[row][col]) {
-                            board[newPos][col] *= 2;
-                            addScore(board[newPos][col]);
-                            board[row][col] = 0;
-                            moved = true;
-                        }
-                    }
-                }
-            }
-        }
-        return moved;
-    }
-
     public boolean moveLeft() {
         boolean moved = false;
         for (int row = 0; row < 4; row++) {
-            for (int col = 1; col < 4; col++) {
-                if (board[row][col] != 0) {
-                    int newPos = findNewPositionLeft(row, col);
-                    if (newPos != col) {
-                        if (board[row][newPos] == 0) {
-                            board[row][newPos] = board[row][col];
-                            board[row][col] = 0;
-                            moved = true;
-                        } else if (board[row][newPos] == board[row][col]) {
-                            board[row][newPos] *= 2;
-                            addScore(board[row][newPos]);
-                            board[row][col] = 0;
-                            moved = true;
-                        }
-                    }
-                }
+            int[] newRow = moveRowLeft(board[row]);
+            if (!Arrays.equals(board[row], newRow)) {
+                board[row] = newRow;
+                moved = true;
             }
         }
         return moved;
@@ -101,57 +44,93 @@ public class GameModel {
     public boolean moveRight() {
         boolean moved = false;
         for (int row = 0; row < 4; row++) {
-            for (int col = 2; col >= 0; col--) {
-                if (board[row][col] != 0) {
-                    int newPos = findNewPositionRight(row, col);
-                    if (newPos != col) {
-                        if (board[row][newPos] == 0) {
-                            board[row][newPos] = board[row][col];
-                            board[row][col] = 0;
-                            moved = true;
-                        } else if (board[row][newPos] == board[row][col]) {
-                            board[row][newPos] *= 2;
-                            addScore(board[row][newPos]);
-                            board[row][col] = 0;
-                            moved = true;
-                        }
-                    }
-                }
+            int[] reversedRow = Arrays.copyOf(board[row], 4);
+            reverseArray(reversedRow);
+            int[] newRow = moveRowLeft(reversedRow);
+            reverseArray(newRow);
+            if (!Arrays.equals(board[row], newRow)) {
+                board[row] = newRow;
+                moved = true;
             }
         }
         return moved;
     }
 
-    private int findNewPositionUp(int row, int col) {
-        int newPos = row;
-        while (newPos > 0 && board[newPos - 1][col] == 0) {
-            newPos--;
+    public boolean moveUp() {
+        boolean moved = false;
+        for (int col = 0; col < 4; col++) {
+            int[] column = new int[4];
+            for (int row = 0; row < 4; row++) {
+                column[row] = board[row][col];
+            }
+            int[] newColumn = moveRowLeft(column);
+            if (!Arrays.equals(column, newColumn)) {
+                for (int row = 0; row < 4; row++) {
+                    board[row][col] = newColumn[row];
+                }
+                moved = true;
+            }
         }
-        return newPos;
+        return moved;
     }
 
-    private int findNewPositionDown(int row, int col) {
-        int newPos = row;
-        while (newPos < 3 && board[newPos + 1][col] == 0) {
-            newPos++;
+    public boolean moveDown() {
+        boolean moved = false;
+        for (int col = 0; col < 4; col++) {
+            int[] column = new int[4];
+            for (int row = 0; row < 4; row++) {
+                column[row] = board[row][col];
+            }
+            reverseArray(column);
+            int[] newColumn = moveRowLeft(column);
+            reverseArray(newColumn);
+            if (!Arrays.equals(column, newColumn)) {
+                for (int row = 0; row < 4; row++) {
+                    board[row][col] = newColumn[row];
+                }
+                moved = true;
+            }
         }
-        return newPos;
+        return moved;
     }
 
-    private int findNewPositionLeft(int row, int col) {
-        int newPos = col;
-        while (newPos > 0 && board[row][newPos - 1] == 0) {
-            newPos--;
+    private int[] moveRowLeft(int[] row) {
+        // Remove zeros
+        int[] newRow = new int[4];
+        int pos = 0;
+        for (int value : row) {
+            if (value != 0) {
+                newRow[pos++] = value;
+            }
         }
-        return newPos;
+
+        // Merge tiles
+        for (int i = 0; i < 3; i++) {
+            if (newRow[i] != 0 && newRow[i] == newRow[i + 1]) {
+                newRow[i] *= 2;
+                addScore(newRow[i]);
+                newRow[i + 1] = 0;
+            }
+        }
+
+        // Remove zeros again after merging
+        int[] finalRow = new int[4];
+        pos = 0;
+        for (int value : newRow) {
+            if (value != 0) {
+                finalRow[pos++] = value;
+            }
+        }
+
+        return finalRow;
     }
 
-    private int findNewPositionRight(int row, int col) {
-        int newPos = col;
-        while (newPos < 3 && board[row][newPos + 1] == 0) {
-            newPos++;
+    private void reverseArray(int[] array) {
+        for (int i = 0; i < array.length / 2; i++) {
+            int temp = array[i];
+            array[i] = array[array.length - 1 - i];
+            array[array.length - 1 - i] = temp;
         }
-        return newPos;
     }
 
     public void addRandomTile() {
@@ -186,7 +165,7 @@ public class GameModel {
         score += points;
     }
 
-    private boolean hasWon() {
+    public boolean hasWon() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 if (board[i][j] == 2048) {
@@ -197,7 +176,7 @@ public class GameModel {
         return false;
     }
 
-    private boolean hasMovesLeft() {
+    public boolean hasMovesLeft() {
         // Check if any empty cells
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
