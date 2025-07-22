@@ -1,9 +1,7 @@
 package com.example.demo;
-
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.KeyCode;
-
+import javafx.scene.input.KeyCode;  // Add this import for KeyCode
 public class Controller {
     private GameModel gameModel;
     private GameView gameView;
@@ -21,30 +19,25 @@ public class Controller {
 
     private void handleKeyPress(KeyEvent event) {
         if (gameModel.isGameOver()) return;
+
         KeyCode code = event.getCode();
         boolean moved = false;
 
         if (code == KeyCode.UP) {
-            moved = gameModel.moveUp();
+            moved = gameView.moveUp();
         } else if (code == KeyCode.DOWN) {
-            moved = gameModel.moveDown();
+            moved = gameView.moveDown();
         } else if (code == KeyCode.LEFT) {
-            moved = gameModel.moveLeft();
+            moved = gameView.moveLeft();
         } else if (code == KeyCode.RIGHT) {
-            moved = gameModel.moveRight();
+            moved = gameView.moveRight();
         }
 
         if (moved) {
-            gameModel.addRandomTile();
-            updateView();
-            if (gameModel.isGameOver()) {
-                sceneManager.showMainMenu();
-            }
+            gameView.updateBoard();
+            gameView.updateScoreDisplay();
+            gameView.addRandomTile();
+            gameView.checkGameStatus();
         }
-    }
-
-    private void updateView() {
-        gameView.updateBoard();  // Fixed: No parameters needed
-        gameView.updateScoreDisplay();  // Fixed: Use correct method name
     }
 }

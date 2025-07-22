@@ -1,6 +1,4 @@
 package com.example.demo;
-
-
 import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -14,7 +12,7 @@ public class SceneManager {
     private Scene accountScene;
     private Scene leaderboardScene;
     private Scene gameScene;
-    private Main mainApp;  // Reference to Main app
+    private Main mainApp;
 
     public SceneManager(Stage primaryStage, Main mainApp) {
         this.primaryStage = primaryStage;
@@ -68,6 +66,6 @@ public class SceneManager {
     }
 
     public void showGame() {
-        mainApp.showGame();  // Use the Main app's showGame method
+        mainApp.showGame();
     }
 }

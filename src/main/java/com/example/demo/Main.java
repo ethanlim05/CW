@@ -1,6 +1,4 @@
 package com.example.demo;
-
-
 import javafx.application.Platform;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -51,10 +49,9 @@ public class Main extends Application {
         return DEFAULT_BACKGROUND_COLOR;
     }
 
-    // Add this method to provide access to the showGame functionality
     public void showGame() {
         System.out.println("Switching to game scene");
-        gameView = new GameView();
+        gameView = new GameView(sceneManager);  // Pass SceneManager here
         Scene gameScene = new Scene(gameView, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         // Set up key event handlers

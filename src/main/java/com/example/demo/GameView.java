@@ -1,22 +1,27 @@
 package com.example.demo;
-
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 public class GameView extends Pane {
     private static final int GRID_SIZE = 4;
     private static final int CELL_SIZE = 100;
     private static final int CELL_SPACING = 10;
-
     private final Cell[][] cells = new Cell[GRID_SIZE][GRID_SIZE];
     private long score = 0;
     private boolean gameOver = false;
     private GameModel gameModel;
     private Label scoreLabel;
+    private Button backButton;
+    private Button topBackButton;  // New button at the top
+    private SceneManager sceneManager;
 
-    public GameView() {
+    public GameView(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
         setPrefSize(Main.getWindowWidth(), Main.getWindowHeight());
         initializeGame();
     }
@@ -25,10 +30,10 @@ public class GameView extends Pane {
         gameModel = new GameModel();
         createGameBoard();
         createScoreDisplay();
-
+        createBackButton();
+        createTopBackButton();  // Create the new top button
         gameModel.addRandomTile();
         gameModel.addRandomTile();
-
         updateBoard();
         updateScoreDisplay();
         System.out.println("GameView initialized");
@@ -37,7 +42,6 @@ public class GameView extends Pane {
     private void createGameBoard() {
         double startX = (Main.getWindowWidth() - (GRID_SIZE * CELL_SIZE + (GRID_SIZE - 1) * CELL_SPACING)) / 2;
         double startY = (Main.getWindowHeight() - (GRID_SIZE * CELL_SIZE + (GRID_SIZE - 1) * CELL_SPACING)) / 2;
-
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
                 double x = startX + col * (CELL_SIZE + CELL_SPACING);
@@ -54,6 +58,43 @@ public class GameView extends Pane {
         scoreLabel.setLayoutX(650);
         scoreLabel.setLayoutY(50);
         this.getChildren().add(scoreLabel);
+    }
+
+    private void createBackButton() {
+        backButton = new Button("Back to Menu");
+        backButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
+        backButton.setLayoutX(350);
+        backButton.setLayoutY(800);
+        backButton.setPrefSize(200, 50);
+        backButton.setOnAction(event -> {
+            System.out.println("Back button clicked");
+            try {
+                sceneManager.showMainMenu();
+            } catch (Exception e) {
+                System.err.println("Error switching to main menu: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        this.getChildren().add(backButton);
+    }
+
+    // New method to create the top Back to Menu button
+    private void createTopBackButton() {
+        topBackButton = new Button("Back to Menu");
+        topBackButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
+        topBackButton.setLayoutX(20);
+        topBackButton.setLayoutY(20);
+        topBackButton.setPrefSize(150, 40);
+        topBackButton.setOnAction(event -> {
+            System.out.println("Top back button clicked");
+            try {
+                sceneManager.showMainMenu();
+            } catch (Exception e) {
+                System.err.println("Error switching to main menu: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        this.getChildren().add(topBackButton);
     }
 
     public void updateBoard() {
@@ -93,11 +134,44 @@ public class GameView extends Pane {
     public void checkGameStatus() {
         if (gameModel.hasWon()) {
             System.out.println("You won!");
-            gameOver = true;
+            showGameOverScreen("YOU WIN!");
         } else if (!gameModel.hasMovesLeft()) {
             System.out.println("Game over!");
-            gameOver = true;
+            showGameOverScreen("GAME OVER");
         }
+    }
+
+    public void showGameOverScreen(String message) {
+        // Create a semi-transparent overlay
+        Rectangle overlay = new Rectangle(
+                Main.getWindowWidth(), Main.getWindowHeight(), Color.rgb(0, 0, 0, 0.7));
+        overlay.setMouseTransparent(true);
+
+        // Create game over text
+        Text gameOverText = new Text(message);
+        gameOverText.setFont(Font.font(60));
+        gameOverText.setFill(Color.WHITE);
+        gameOverText.setX(Main.getWindowWidth() / 2 - 150);
+        gameOverText.setY(Main.getWindowHeight() / 2 - 50);
+
+        // Create back to menu button
+        Button menuButton = new Button("Back to Menu");
+        menuButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
+        menuButton.setPrefSize(200, 50);
+        menuButton.setLayoutX(Main.getWindowWidth() / 2 - 100);
+        menuButton.setLayoutY(Main.getWindowHeight() / 2 + 50);
+        menuButton.setOnAction(event -> {
+            System.out.println("Menu button clicked from game over screen");
+            try {
+                sceneManager.showMainMenu();
+            } catch (Exception e) {
+                System.err.println("Error switching to main menu: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+
+        // Add elements to the game view
+        this.getChildren().addAll(overlay, gameOverText, menuButton);
     }
 
     public boolean isGameOver() {
