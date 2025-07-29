@@ -1,0 +1,5 @@
+module:com.example.demo
+com.example.demo
+com.example.demo.controller
+com.example.demo.model
+com.example.demo.view
