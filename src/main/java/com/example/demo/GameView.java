@@ -11,14 +11,14 @@ import javafx.scene.text.TextAlignment;
 
 public class GameView extends Pane {
     private static final int GRID_SIZE = 4;
-    private static final int CELL_SIZE = 150; // Increased from 100 to 150
-    private static final int CELL_SPACING = 15; // Increased from 10 to 15
+    private static final int CELL_SIZE = 150;
+    private static final int CELL_SPACING = 15;
     private final Cell[][] cells = new Cell[GRID_SIZE][GRID_SIZE];
     private long score = 0;
     private boolean gameOver = false;
     private GameModel gameModel;
     private Label scoreLabel;
-    private Button backButton; // Only keeping one back button
+    private Button backButton;
     private SceneManager sceneManager;
 
     // Store original dimensions for resetting
@@ -42,7 +42,7 @@ public class GameView extends Pane {
         gameModel = new GameModel();
         createGameBoard();
         createScoreDisplay();
-        createBackButton(); // Only create one back button
+        createBackButton();
         gameModel.addRandomTile();
         gameModel.addRandomTile();
         updateBoard();
@@ -65,7 +65,7 @@ public class GameView extends Pane {
 
     private void createScoreDisplay() {
         scoreLabel = new Label("SCORE: 0");
-        scoreLabel.setFont(Font.font(30)); // Increased font size
+        scoreLabel.setFont(Font.font(30));
         scoreLabel.setTextFill(Color.BLACK);
         scoreLabel.setLayoutX(originalWidth - 250);
         scoreLabel.setLayoutY(50);
@@ -76,9 +76,10 @@ public class GameView extends Pane {
         backButton = new Button("Back to Menu");
         backButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
         backButton.setLayoutX((originalWidth - 200) / 2);
-        backButton.setLayoutY(originalHeight - 100);
-        backButton.setPrefSize(200, 60); // Increased button size
-        backButton.setFont(Font.font(22)); // Increased font size
+        // Moved button lower - changed from originalHeight - 100 to originalHeight - 50
+        backButton.setLayoutY(originalHeight - 50);
+        backButton.setPrefSize(200, 60);
+        backButton.setFont(Font.font(22));
         backButton.setOnAction(event -> {
             System.out.println("Back button clicked");
             try {
@@ -148,7 +149,7 @@ public class GameView extends Pane {
 
         // Create game over text
         Text gameOverText = new Text(message);
-        gameOverText.setFont(Font.font(80)); // Increased font size
+        gameOverText.setFont(Font.font(80));
         gameOverText.setFill(Color.WHITE);
         gameOverText.setX(getWidth() / 2 - 200);
         gameOverText.setY(getHeight() / 2 - 50);
@@ -156,8 +157,8 @@ public class GameView extends Pane {
         // Create back to menu button
         Button menuButton = new Button("Back to Menu");
         menuButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
-        menuButton.setPrefSize(250, 70); // Increased button size
-        menuButton.setFont(Font.font(26)); // Increased font size
+        menuButton.setPrefSize(250, 70);
+        menuButton.setFont(Font.font(26));
         menuButton.setLayoutX(getWidth() / 2 - 125);
         menuButton.setLayoutY(getHeight() / 2 + 50);
         menuButton.setOnAction(event -> {
@@ -183,7 +184,7 @@ public class GameView extends Pane {
 
     // New method to adjust to fullscreen
     public void adjustToFullscreen(double screenWidth, double screenHeight) {
-        // Calculate margins (5% of screen size - reduced to make board bigger)
+        // Calculate margins (5% of screen size)
         double marginX = screenWidth * 0.05;
         double marginY = screenHeight * 0.05;
 
@@ -192,7 +193,7 @@ public class GameView extends Pane {
         double availableHeight = screenHeight - 2 * marginY;
 
         // Calculate maximum cell size that fits in available space
-        // We want to use 80% of available height for the game board (increased from 70%)
+        // We want to use 80% of available height for the game board
         double boardHeight = availableHeight * 0.8;
         double cellSize = boardHeight / GRID_SIZE;
 
@@ -219,14 +220,15 @@ public class GameView extends Pane {
         double uiScale = Math.min(screenWidth / originalWidth, screenHeight / originalHeight) * 0.9;
 
         // Adjust UI elements
-        double uiFontSize = 30 * uiScale; // Increased base font size
+        double uiFontSize = 30 * uiScale;
         scoreLabel.setFont(Font.font(uiFontSize));
         scoreLabel.setLayoutX(screenWidth - 250 * uiScale);
         scoreLabel.setLayoutY(50 * uiScale);
 
         backButton.setFont(Font.font(22 * uiScale));
         backButton.setLayoutX((screenWidth - 200 * uiScale) / 2);
-        backButton.setLayoutY(screenHeight - 100 * uiScale);
+        // Adjusted button position for fullscreen mode - moved lower
+        backButton.setLayoutY(screenHeight - 50 * uiScale);
         backButton.setPrefSize(200 * uiScale, 60 * uiScale);
     }
 
@@ -251,7 +253,8 @@ public class GameView extends Pane {
 
         backButton.setFont(Font.font(22));
         backButton.setLayoutX((originalWidth - 200) / 2);
-        backButton.setLayoutY(originalHeight - 100);
+        // Reset button position to the new lower position
+        backButton.setLayoutY(originalHeight - 50);
         backButton.setPrefSize(200, 60);
     }
 }
