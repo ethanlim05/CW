@@ -1,4 +1,6 @@
 package com.example.demo;
+
+
 import javafx.application.Platform;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -21,6 +23,7 @@ public class Main extends Application {
         this.primaryStage.setTitle("2048 Game - Resit Coursework");
         try {
             initializeApplication();
+            Account.loadScores(); // Load saved scores
             sceneManager.showMainMenu();
             this.primaryStage.show();
         } catch (Exception e) {
@@ -51,7 +54,7 @@ public class Main extends Application {
 
     public void showGame() {
         System.out.println("Switching to game scene");
-        gameView = new GameView(sceneManager);  // Pass SceneManager here
+        gameView = new GameView(sceneManager);
         Scene gameScene = new Scene(gameView, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         // Set up key event handlers

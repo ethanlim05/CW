@@ -1,4 +1,6 @@
 package com.example.demo;
+
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -17,7 +19,7 @@ public class GameView extends Pane {
     private GameModel gameModel;
     private Label scoreLabel;
     private Button backButton;
-    private Button topBackButton;  // New button at the top
+    private Button topBackButton;
     private SceneManager sceneManager;
 
     public GameView(SceneManager sceneManager) {
@@ -31,7 +33,7 @@ public class GameView extends Pane {
         createGameBoard();
         createScoreDisplay();
         createBackButton();
-        createTopBackButton();  // Create the new top button
+        createTopBackButton();
         gameModel.addRandomTile();
         gameModel.addRandomTile();
         updateBoard();
@@ -54,7 +56,7 @@ public class GameView extends Pane {
     private void createScoreDisplay() {
         scoreLabel = new Label("SCORE: 0");
         scoreLabel.setFont(Font.font(24));
-        scoreLabel.setTextFill(Color.WHITE);
+        scoreLabel.setTextFill(Color.BLACK);
         scoreLabel.setLayoutX(650);
         scoreLabel.setLayoutY(50);
         this.getChildren().add(scoreLabel);
@@ -76,9 +78,9 @@ public class GameView extends Pane {
             }
         });
         this.getChildren().add(backButton);
+        System.out.println("Back button added. Children count: " + this.getChildren().size());
     }
 
-    // New method to create the top Back to Menu button
     private void createTopBackButton() {
         topBackButton = new Button("Back to Menu");
         topBackButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
@@ -95,6 +97,7 @@ public class GameView extends Pane {
             }
         });
         this.getChildren().add(topBackButton);
+        System.out.println("Top back button added. Children count: " + this.getChildren().size());
     }
 
     public void updateBoard() {
@@ -141,6 +144,10 @@ public class GameView extends Pane {
         }
     }
 
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
     public void showGameOverScreen(String message) {
         // Create a semi-transparent overlay
         Rectangle overlay = new Rectangle(
@@ -163,6 +170,13 @@ public class GameView extends Pane {
         menuButton.setOnAction(event -> {
             System.out.println("Menu button clicked from game over screen");
             try {
+                // Find the account with the current username and update its score
+                Account account = Account.getInstance();  // Get the current account
+                System.out.println("DEBUG - Account found: " + account.getUserName() + " with score: " + account.getScore());
+                account.addToScore(score);  // Add the actual game score
+                System.out.println("DEBUG - Score after adding: " + account.getScore());
+                Account.saveScores();  // Save to file
+                System.out.println("Score saved successfully! New score: " + score);
                 sceneManager.showMainMenu();
             } catch (Exception e) {
                 System.err.println("Error switching to main menu: " + e.getMessage());
@@ -172,9 +186,5 @@ public class GameView extends Pane {
 
         // Add elements to the game view
         this.getChildren().addAll(overlay, gameOverText, menuButton);
-    }
-
-    public boolean isGameOver() {
-        return gameOver;
     }
 }
