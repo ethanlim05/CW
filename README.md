@@ -34,8 +34,11 @@ https://github.com/ethanlim05/CW.git
 - Fixed score saving issue: Resolved a bug where scores were not being saved correctly between game sessions.
 - Fixed username validation: Added proper validation to prevent empty or duplicate usernames.
 - Fixed fullscreen mode: Implemented proper fullscreen functionality that scales the game board appropriately.
+- Fixed tile positioning: Resolved issues where number boxes were appearing outside the grid boundaries.
+- Fixed text centering: Corrected problems where numbers were jumping outside their tiles during animations.
 
 ## General Features
+- Smooth Animations: Implemented smooth animations for tile movements and merges without changing gameplay mechanics.
 - Fullscreen Mode: The game can be played in fullscreen mode by clicking the "Play" button. Press ESC to exit fullscreen.
 - Account Management: Users can create accounts with unique usernames and save their scores.
 - Leaderboard System: Displays top 10 player scores sorted from highest to lowest.
@@ -52,6 +55,8 @@ https://github.com/ethanlim05/CW.git
 - Win Condition: The game is won when a tile with the value 2048 appears.
 - Game Over Detection: The game ends when no more valid moves are possible.
 - Score Calculation: Points are awarded when tiles merge, with the value of the new tile added to the score.
+- Animated Tile Appearance: New tiles now appear with a smooth scaling animation.
+- Animated Tile Movement: Tiles smoothly slide to their new positions when moved.
 
 # Implemented but Not Working Properly
 
@@ -79,7 +84,7 @@ https://github.com/ethanlim05/CW.git
 | GameConstants | src/main/java/com/example/demo/model/GameConstants.java     | Contains constants used throughout the game, such as window dimensions and cell sizes.     |
 | GameBoard     | src/main/java/com/example/demo/view/GameBoard.java          | Represents the game board and handles the visual representation of the grid.               |
 | ScoreDisplay  | src/main/java/com/example/demo/view/ScoreDisplay.java       | Displays the current score during gameplay.                                                |
-
+| AnimatedTile  | src/main/java/com/example/demo/view/AnimatedTile.java       | Handles the visual representation and animations of individual tiles.                      |
 
 # Modified Java Class
 
@@ -121,6 +126,7 @@ https://github.com/ethanlim05/CW.git
 ## Controller.java
 - Added ESC key handling for fullscreen mode.
 - Improved key event handling for better responsiveness.
+- Simplified animation handling by moving animation logic to GameView.
 
 ## GameModel.java
 - Enhanced game logic for better tile movement and merging.
@@ -153,3 +159,9 @@ https://github.com/ethanlim05/CW.git
 - Memory Usage: The game was using more memory than necessary, especially when switching between scenes.
 - Solution: Implemented proper cleanup of UI elements when switching scenes.
 - Added methods to explicitly clear and reset game state when returning to the main menu.
+
+## Animation System Complexity
+- Tile Positioning During Animation: Initial animation implementation caused tiles to jump outside their intended positions.
+- Solution: Created a new AnimatedTile class with proper animation handling and containment.
+- Implemented grid and cell-level clipping to ensure tiles stay within boundaries during animations.
+- Simplified the animation system to use basic transitions without complex translation calculations.
