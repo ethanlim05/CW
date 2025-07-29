@@ -1,28 +1,38 @@
 package com.example.demo.view;
 
-import com.example.demo.Main;
-import com.example.demo.controller.SceneManager;
-import com.example.demo.model.Account;
-import com.example.demo.model.GameModel;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.util.Duration;
+
+import com.example.demo.model.GameModel;
+import com.example.demo.model.Account;
+import com.example.demo.controller.SceneManager;
+import com.example.demo.Main;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameView extends Pane {
     private static final int GRID_SIZE = 4;
-    private static final int CELL_SIZE = 150;
-    private static final int CELL_SPACING = 15;
-    private final Cell[][] cells = new Cell[GRID_SIZE][GRID_SIZE];
+    // Increased cell size and spacing for larger grid
+    private static final int CELL_SIZE = 200;  // Increased from 150
+    private static final int CELL_SPACING = 20; // Increased from 15
+    private final Pane[][] cells = new Pane[GRID_SIZE][GRID_SIZE];
+    private final AnimatedTile[][] tiles = new AnimatedTile[GRID_SIZE][GRID_SIZE];
     private long score = 0;
     private boolean gameOver = false;
     private GameModel gameModel;
     private Label scoreLabel;
     private Button backButton;
     private SceneManager sceneManager;
+    private boolean isAnimating = false;
+    private Pane gridContainer;
 
     // Store original dimensions for resetting
     private double originalWidth;
@@ -45,7 +55,7 @@ public class GameView extends Pane {
         gameModel = new GameModel();
         createGameBoard();
         createScoreDisplay();
-        createBackButton();
+        createBackButton(); // Create back button first so it's behind other elements
         gameModel.addRandomTile();
         gameModel.addRandomTile();
         updateBoard();
@@ -54,35 +64,93 @@ public class GameView extends Pane {
     }
 
     private void createGameBoard() {
-        double startX = (originalWidth - (GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing)) / 2;
-        double startY = (originalHeight - (GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing)) / 2;
+        // Calculate grid dimensions with larger cells
+        double gridWidth = GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing;
+        double gridHeight = GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing;
 
+        // Add padding to ensure tiles are fully visible
+        double padding = originalCellSpacing;
+        double extraBottomPadding = originalCellSpacing * 5; // Further increased extra padding at the bottom
+        double paddedGridWidth = gridWidth + 2 * padding;
+        double paddedGridHeight = gridHeight + padding + extraBottomPadding; // Extra space at bottom
+
+        // Center the grid with more space
+        double startX = (originalWidth - paddedGridWidth) / 2;
+        // Move grid down a bit to make room for top-left button
+        double startY = (originalHeight - paddedGridHeight) / 2 + 30;
+
+        // Create a container for the grid
+        gridContainer = new Pane();
+        gridContainer.setLayoutX(startX);
+        gridContainer.setLayoutY(startY);
+        gridContainer.setPrefSize(paddedGridWidth, paddedGridHeight);
+
+        // Add clipping to ensure nothing appears outside the grid
+        Rectangle clip = new Rectangle(0, 0, paddedGridWidth, paddedGridHeight);
+        gridContainer.setClip(clip);
+
+        this.getChildren().add(gridContainer);
+
+        // Create background for the entire grid (now covers the entire padded area)
+        Rectangle gridBackground = new Rectangle(0, 0, paddedGridWidth, paddedGridHeight);
+        gridBackground.setFill(Color.rgb(187, 173, 160));
+        gridBackground.setArcWidth(20);
+        gridBackground.setArcHeight(20);
+        gridContainer.getChildren().add(gridBackground);
+
+        // Create cell containers and tiles
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                double x = startX + col * (originalCellSize + originalCellSpacing);
-                double y = startY + row * (originalCellSize + originalCellSpacing);
-                cells[row][col] = new Cell(x, y, originalCellSize, this);
+                double x = padding + col * (originalCellSize + originalCellSpacing);
+                double y = padding + row * (originalCellSize + originalCellSpacing);
+
+                // Create cell container
+                Pane cell = new Pane();
+                cell.setLayoutX(x);
+                cell.setLayoutY(y);
+                cell.setPrefSize(originalCellSize, originalCellSize);
+
+                // Add clipping to each cell to ensure tiles stay within
+                Rectangle cellClip = new Rectangle(0, 0, originalCellSize, originalCellSize);
+                cell.setClip(cellClip);
+
+                cells[row][col] = cell;
+                gridContainer.getChildren().add(cell);
+
+                // Create cell background
+                Rectangle cellBg = new Rectangle(0, 0, originalCellSize, originalCellSize);
+                cellBg.setFill(Color.rgb(205, 193, 180));
+                cellBg.setArcWidth(10);
+                cellBg.setArcHeight(10);
+                cell.getChildren().add(cellBg);
+
+                // Create animated tile (initially hidden)
+                AnimatedTile tile = new AnimatedTile(originalCellSize);
+                tile.setVisible(false);
+                tiles[row][col] = tile;
+                cell.getChildren().add(tile);
             }
         }
     }
 
     private void createScoreDisplay() {
         scoreLabel = new Label("SCORE: 0");
-        scoreLabel.setFont(Font.font(30));
+        scoreLabel.setFont(Font.font(36)); // Increased font size
         scoreLabel.setTextFill(Color.BLACK);
-        scoreLabel.setLayoutX(originalWidth - 250);
-        scoreLabel.setLayoutY(50);
+        // Position score at top right
+        scoreLabel.setLayoutX(originalWidth - 200);
+        scoreLabel.setLayoutY(30);
         this.getChildren().add(scoreLabel);
     }
 
     private void createBackButton() {
         backButton = new Button("Back to Menu");
         backButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
-        backButton.setLayoutX((originalWidth - 200) / 2);
-        // Moved button lower - changed from originalHeight - 100 to originalHeight - 50
-        backButton.setLayoutY(originalHeight - 50);
-        backButton.setPrefSize(200, 60);
-        backButton.setFont(Font.font(22));
+        // Position at top left
+        backButton.setLayoutX(20);
+        backButton.setLayoutY(20);
+        backButton.setPrefSize(150, 50); // Increased button size
+        backButton.setFont(Font.font(18)); // Increased font size
         backButton.setOnAction(event -> {
             System.out.println("Back button clicked");
             try {
@@ -93,15 +161,60 @@ public class GameView extends Pane {
             }
         });
         this.getChildren().add(backButton);
-        System.out.println("Back button added. Children count: " + this.getChildren().size());
+        System.out.println("Back button added at top left");
     }
 
     public void updateBoard() {
         int[][] board = gameModel.getBoard();
+
+        // Store current positions to detect movements
+        List<TilePosition> oldPositions = new ArrayList<>();
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                cells[row][col].setNumber(board[row][col]);
+                if (tiles[row][col].isVisible() && tiles[row][col].getNumber() != 0) {
+                    oldPositions.add(new TilePosition(row, col, tiles[row][col].getNumber()));
+                }
             }
+        }
+
+        // Update board with animations
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                int value = board[row][col];
+
+                if (value != 0) {
+                    // Show and update the tile
+                    tiles[row][col].setVisible(true);
+                    tiles[row][col].setNumber(value);
+
+                    // Animate new tiles
+                    if (!wasTileAtPosition(oldPositions, row, col, value)) {
+                        tiles[row][col].animateNewTile();
+                    }
+                } else {
+                    // Hide the tile
+                    tiles[row][col].setVisible(false);
+                }
+            }
+        }
+    }
+
+    private boolean wasTileAtPosition(List<TilePosition> positions, int row, int col, int value) {
+        for (TilePosition pos : positions) {
+            if (pos.row == row && pos.col == col && pos.value == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static class TilePosition {
+        int row, col, value;
+
+        TilePosition(int row, int col, int value) {
+            this.row = row;
+            this.col = col;
+            this.value = value;
         }
     }
 
@@ -111,19 +224,60 @@ public class GameView extends Pane {
     }
 
     public boolean moveUp() {
-        return gameModel.moveUp();
+        if (isAnimating) return false;
+
+        boolean moved = gameModel.moveUp();
+        if (moved) {
+            animateMove("UP");
+        }
+        return moved;
     }
 
     public boolean moveDown() {
-        return gameModel.moveDown();
+        if (isAnimating) return false;
+
+        boolean moved = gameModel.moveDown();
+        if (moved) {
+            animateMove("DOWN");
+        }
+        return moved;
     }
 
     public boolean moveLeft() {
-        return gameModel.moveLeft();
+        if (isAnimating) return false;
+
+        boolean moved = gameModel.moveLeft();
+        if (moved) {
+            animateMove("LEFT");
+        }
+        return moved;
     }
 
     public boolean moveRight() {
-        return gameModel.moveRight();
+        if (isAnimating) return false;
+
+        boolean moved = gameModel.moveRight();
+        if (moved) {
+            animateMove("RIGHT");
+        }
+        return moved;
+    }
+
+    private void animateMove(String direction) {
+        isAnimating = true;
+
+        // Set a timer to mark animation as complete
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.millis(150),
+                ae -> {
+                    isAnimating = false;
+                    updateBoard();
+                    updateScoreDisplay();
+                    addRandomTile();
+                    checkGameStatus();
+                }
+        ));
+        timeline.play();
     }
 
     public void addRandomTile() {
@@ -151,7 +305,7 @@ public class GameView extends Pane {
         overlay.setMouseTransparent(true);
 
         // Create game over text
-        Text gameOverText = new Text(message);
+        javafx.scene.text.Text gameOverText = new javafx.scene.text.Text(message);
         gameOverText.setFont(Font.font(80));
         gameOverText.setFill(Color.WHITE);
         gameOverText.setX(getWidth() / 2 - 200);
@@ -187,35 +341,72 @@ public class GameView extends Pane {
 
     // New method to adjust to fullscreen
     public void adjustToFullscreen(double screenWidth, double screenHeight) {
-        // Calculate margins (5% of screen size)
-        double marginX = screenWidth * 0.05;
-        double marginY = screenHeight * 0.05;
+        // Calculate margins (3% of screen size - reduced for more space)
+        double marginX = screenWidth * 0.03;
+        double marginY = screenHeight * 0.03;
 
         // Calculate available space
         double availableWidth = screenWidth - 2 * marginX;
         double availableHeight = screenHeight - 2 * marginY;
 
         // Calculate maximum cell size that fits in available space
-        // We want to use 80% of available height for the game board
+        // Use 80% of available height for the game board (increased from 70%)
         double boardHeight = availableHeight * 0.8;
         double cellSize = boardHeight / GRID_SIZE;
 
         // Calculate spacing (10% of cell size)
         double cellSpacing = cellSize * 0.1;
 
-        // Calculate total board width
-        double totalBoardWidth = GRID_SIZE * cellSize + (GRID_SIZE - 1) * cellSpacing;
+        // Calculate grid dimensions
+        double gridWidth = GRID_SIZE * cellSize + (GRID_SIZE - 1) * cellSpacing;
+
+        // Add padding to ensure tiles are fully visible
+        double padding = cellSpacing;
+        double extraBottomPadding = cellSpacing * 5; // Further increased extra padding at the bottom
+        double paddedGridWidth = gridWidth + 2 * padding;
+        double paddedGridHeight = boardHeight + padding + extraBottomPadding; // Extra space at bottom
 
         // Center the board
-        double startX = (screenWidth - totalBoardWidth) / 2;
-        double startY = marginY + (availableHeight - boardHeight) / 2;
+        double startX = (screenWidth - paddedGridWidth) / 2;
+        // Move grid down a bit to make room for top-left button
+        double startY = marginY + (availableHeight - paddedGridHeight) / 2 + 30;
 
-        // Update all cells
+        // Update grid container position and size
+        gridContainer.setLayoutX(startX);
+        gridContainer.setLayoutY(startY);
+        gridContainer.setPrefSize(paddedGridWidth, paddedGridHeight);
+
+        // Update grid container clip
+        Rectangle gridClip = new Rectangle(0, 0, paddedGridWidth, paddedGridHeight);
+        gridContainer.setClip(gridClip);
+
+        // Update grid background (now covers entire padded area)
+        Rectangle gridBackground = (Rectangle) gridContainer.getChildren().get(0);
+        gridBackground.setWidth(paddedGridWidth);
+        gridBackground.setHeight(paddedGridHeight);
+
+        // Update all cell containers and tiles
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                double x = startX + col * (cellSize + cellSpacing);
-                double y = startY + row * (cellSize + cellSpacing);
-                cells[row][col].resizeForFullscreen(x, y, cellSize);
+                double x = padding + col * (cellSize + cellSpacing);
+                double y = padding + row * (cellSize + cellSpacing);
+
+                // Update cell container
+                cells[row][col].setLayoutX(x);
+                cells[row][col].setLayoutY(y);
+                cells[row][col].setPrefSize(cellSize, cellSize);
+
+                // Update cell clip
+                Rectangle cellClip = new Rectangle(0, 0, cellSize, cellSize);
+                cells[row][col].setClip(cellClip);
+
+                // Update cell background
+                Rectangle cellBg = (Rectangle) cells[row][col].getChildren().get(0);
+                cellBg.setWidth(cellSize);
+                cellBg.setHeight(cellSize);
+
+                // Update tile
+                tiles[row][col].resize(cellSize);
             }
         }
 
@@ -223,41 +414,81 @@ public class GameView extends Pane {
         double uiScale = Math.min(screenWidth / originalWidth, screenHeight / originalHeight) * 0.9;
 
         // Adjust UI elements
-        double uiFontSize = 30 * uiScale;
+        double uiFontSize = 36 * uiScale; // Increased base font size
         scoreLabel.setFont(Font.font(uiFontSize));
-        scoreLabel.setLayoutX(screenWidth - 250 * uiScale);
-        scoreLabel.setLayoutY(50 * uiScale);
+        scoreLabel.setLayoutX(screenWidth - 200 * uiScale);
+        scoreLabel.setLayoutY(30 * uiScale);
 
-        backButton.setFont(Font.font(22 * uiScale));
-        backButton.setLayoutX((screenWidth - 200 * uiScale) / 2);
-        // Adjusted button position for fullscreen mode - moved lower
-        backButton.setLayoutY(screenHeight - 50 * uiScale);
-        backButton.setPrefSize(200 * uiScale, 60 * uiScale);
+        // Position back button at top left
+        backButton.setFont(Font.font(18 * uiScale));
+        backButton.setLayoutX(20 * uiScale);
+        backButton.setLayoutY(20 * uiScale);
+        backButton.setPrefSize(150 * uiScale, 50 * uiScale);
     }
 
     // New method to reset to original size
     public void resetToOriginalSize() {
-        // Reset cell sizes
-        double startX = (originalWidth - (GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing)) / 2;
-        double startY = (originalHeight - (GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing)) / 2;
+        // Reset tile sizes
+        double gridWidth = GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing;
+        double gridHeight = GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing;
+
+        // Add padding to ensure tiles are fully visible
+        double padding = originalCellSpacing;
+        double extraBottomPadding = originalCellSpacing * 5; // Further increased extra padding at the bottom
+        double paddedGridWidth = gridWidth + 2 * padding;
+        double paddedGridHeight = gridHeight + padding + extraBottomPadding; // Extra space at bottom
+
+        double startX = (originalWidth - paddedGridWidth) / 2;
+        // Move grid down a bit to make room for top-left button
+        double startY = (originalHeight - paddedGridHeight) / 2 + 30;
+
+        // Update grid container position and size
+        gridContainer.setLayoutX(startX);
+        gridContainer.setLayoutY(startY);
+        gridContainer.setPrefSize(paddedGridWidth, paddedGridHeight);
+
+        // Update grid container clip
+        Rectangle gridClip = new Rectangle(0, 0, paddedGridWidth, paddedGridHeight);
+        gridContainer.setClip(gridClip);
+
+        // Update grid background (now covers entire padded area)
+        Rectangle gridBackground = (Rectangle) gridContainer.getChildren().get(0);
+        gridBackground.setWidth(paddedGridWidth);
+        gridBackground.setHeight(paddedGridHeight);
 
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                double x = startX + col * (originalCellSize + originalCellSpacing);
-                double y = startY + row * (originalCellSize + originalCellSpacing);
-                cells[row][col].resizeForFullscreen(x, y, originalCellSize);
+                double x = padding + col * (originalCellSize + originalCellSpacing);
+                double y = padding + row * (originalCellSize + originalCellSpacing);
+
+                // Update cell container
+                cells[row][col].setLayoutX(x);
+                cells[row][col].setLayoutY(y);
+                cells[row][col].setPrefSize(originalCellSize, originalCellSize);
+
+                // Update cell clip
+                Rectangle cellClip = new Rectangle(0, 0, originalCellSize, originalCellSize);
+                cells[row][col].setClip(cellClip);
+
+                // Update cell background
+                Rectangle cellBg = (Rectangle) cells[row][col].getChildren().get(0);
+                cellBg.setWidth(originalCellSize);
+                cellBg.setHeight(originalCellSize);
+
+                // Update tile
+                tiles[row][col].resize(originalCellSize);
             }
         }
 
         // Reset UI elements
-        scoreLabel.setFont(Font.font(30));
-        scoreLabel.setLayoutX(originalWidth - 250);
-        scoreLabel.setLayoutY(50);
+        scoreLabel.setFont(Font.font(36));
+        scoreLabel.setLayoutX(originalWidth - 200);
+        scoreLabel.setLayoutY(30);
 
-        backButton.setFont(Font.font(22));
-        backButton.setLayoutX((originalWidth - 200) / 2);
-        // Reset button position to the new lower position
-        backButton.setLayoutY(originalHeight - 50);
-        backButton.setPrefSize(200, 60);
+        // Position back button at top left
+        backButton.setFont(Font.font(18));
+        backButton.setLayoutX(20);
+        backButton.setLayoutY(20);
+        backButton.setPrefSize(150, 50);
     }
 }

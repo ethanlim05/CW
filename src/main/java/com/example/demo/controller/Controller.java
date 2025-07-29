@@ -1,11 +1,11 @@
 package com.example.demo.controller;
 
-
-import com.example.demo.model.GameModel;
-import com.example.demo.view.GameView;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.KeyCode;  // Add this import for KeyCode
+import javafx.scene.input.KeyCode;
+import com.example.demo.model.GameModel;
+import com.example.demo.view.GameView;
+
 public class Controller {
     private GameModel gameModel;
     private GameView gameView;
@@ -37,11 +37,6 @@ public class Controller {
             moved = gameView.moveRight();
         }
 
-        if (moved) {
-            gameView.updateBoard();
-            gameView.updateScoreDisplay();
-            gameView.addRandomTile();
-            gameView.checkGameStatus();
-        }
+        // Note: Animation handling is now inside GameView's move methods
     }
 }
