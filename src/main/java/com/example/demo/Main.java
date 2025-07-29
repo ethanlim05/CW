@@ -1,11 +1,12 @@
 package com.example.demo;
 
+import com.example.demo.controller.SceneManager;
+import com.example.demo.model.Account;
+import com.example.demo.view.GameView;
 import javafx.application.Platform;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Screen;
