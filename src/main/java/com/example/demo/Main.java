@@ -1,6 +1,5 @@
 package com.example.demo;
 
-
 import javafx.application.Platform;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -9,6 +8,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.Screen;
+import javafx.geometry.Rectangle2D;
+
 public class Main extends Application {
     private static final int WINDOW_WIDTH = 900;
     private static final int WINDOW_HEIGHT = 900;
@@ -16,6 +18,7 @@ public class Main extends Application {
     private Stage primaryStage;
     private SceneManager sceneManager;
     private GameView gameView;
+    private boolean isFullscreen = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -60,6 +63,13 @@ public class Main extends Application {
         // Set up key event handlers
         gameScene.setOnKeyPressed(event -> {
             System.out.println("Key Pressed: " + event.getCode());
+
+            // Handle ESC key to exit fullscreen
+            if (event.getCode() == KeyCode.ESCAPE && isFullscreen) {
+                exitFullscreen();
+                return;
+            }
+
             boolean moved = false;
             switch (event.getCode()) {
                 case UP -> moved = gameView.moveUp();
@@ -88,7 +98,32 @@ public class Main extends Application {
         });
 
         primaryStage.setScene(gameScene);
-        primaryStage.show();
-        System.out.println("Game scene shown");
+
+        // Enter fullscreen mode
+        enterFullscreen();
+
+        System.out.println("Game scene shown in fullscreen mode");
+    }
+
+    private void enterFullscreen() {
+        isFullscreen = true;
+        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreenExitHint("Press ESC to exit fullscreen");
+
+        // Adjust game view to fullscreen
+        if (gameView != null) {
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            gameView.adjustToFullscreen(screenBounds.getWidth(), screenBounds.getHeight());
+        }
+    }
+
+    private void exitFullscreen() {
+        isFullscreen = false;
+        primaryStage.setFullScreen(false);
+
+        // Reset game view to original size
+        if (gameView != null) {
+            gameView.resetToOriginalSize();
+        }
     }
 }
