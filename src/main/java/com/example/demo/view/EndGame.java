@@ -1,16 +1,12 @@
 package com.example.demo.view;
 
-import javafx.event.EventHandler;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import java.util.Optional;
 
 public class EndGame {
@@ -25,7 +21,7 @@ public class EndGame {
         return singleInstance;
     }
 
-    public void endGameShow(Scene endGameScene, Group root, Stage primaryStage, long score) {
+    public void endGameShow(Group root, long score) {
         Text gameOverText = new Text("GAME OVER");
         gameOverText.relocate(250, 250);
         gameOverText.setFont(Font.font(80));
@@ -43,18 +39,17 @@ public class EndGame {
         root.getChildren().add(quitButton);
         quitButton.relocate(100, 800);
 
-        quitButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Quit Dialog");
-                alert.setHeaderText("Quit from this page");
-                alert.setContentText("Are you sure?");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.get() == ButtonType.OK){
+        quitButton.setOnMouseClicked(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Quit Dialog");
+            alert.setHeaderText("Quit from this page");
+            alert.setContentText("Are you sure?");
+            Optional<ButtonType> result = alert.showAndWait();
+            result.ifPresent(buttonType -> {
+                if (buttonType == ButtonType.OK) {
                     root.getChildren().clear();
                 }
-            }
+            });
         });
     }
 }
