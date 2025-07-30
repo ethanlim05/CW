@@ -1,14 +1,14 @@
 package com.example.demo.model;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.io.*;
+
 public class Account implements Comparable<Account> {
     private String userName;
     private long score = 0;
-    private static List<Account> accounts = new ArrayList<>();
+    private static final List<Account> accounts = new ArrayList<>();
     private static Account singleInstance = null;
 
     public Account(String userName) {
@@ -96,7 +96,6 @@ public class Account implements Comparable<Account> {
             // Get the current directory path
             String currentDir = System.getProperty("user.dir");
             String filePath = currentDir + File.separator + "scores.txt";
-
             File file = new File(filePath);
             System.out.println("Saving scores to: " + file.getAbsolutePath());
             System.out.println("Number of accounts to save: " + accounts.size());
@@ -111,7 +110,8 @@ public class Account implements Comparable<Account> {
             }
         } catch (FileNotFoundException e) {
             System.err.println("Error saving scores: " + e.getMessage());
-            e.printStackTrace();
+            // Log the exception with more context
+            System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
@@ -122,7 +122,6 @@ public class Account implements Comparable<Account> {
             // Get the current directory path
             String currentDir = System.getProperty("user.dir");
             String filePath = currentDir + File.separator + "scores.txt";
-
             File file = new File(filePath);
             System.out.println("Loading scores from: " + file.getAbsolutePath());
 
@@ -153,10 +152,12 @@ public class Account implements Comparable<Account> {
             System.out.println("No saved scores found, starting fresh");
         } catch (IOException e) {
             System.err.println("Error loading scores (IO): " + e.getMessage());
-            e.printStackTrace();
+            // Log the exception with more context
+            System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
         } catch (NumberFormatException e) {
             System.err.println("Error loading scores (Number format): " + e.getMessage());
-            e.printStackTrace();
+            // Log the exception with more context
+            System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
