@@ -8,20 +8,11 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class Cell {
-    private Rectangle rectangle;
-    private Text text;
-    private final Pane root;
+    private final Rectangle rectangle;
+    private final Text text;
     private int number = 0;
-    private double originalX;
-    private double originalY;
-    private double originalSize;
 
     public Cell(double x, double y, double size, Pane root) {
-        this.root = root;
-        this.originalX = x;
-        this.originalY = y;
-        this.originalSize = size;
-
         // Create rectangle
         rectangle = new Rectangle(x, y, size, size);
         rectangle.setFill(getColorForNumber(0));
@@ -46,20 +37,12 @@ public class Cell {
         updateDisplay();
     }
 
-    public int getNumber() {
-        return number;
-    }
-
     public double getX() {
         return rectangle.getX();
     }
 
     public double getY() {
         return rectangle.getY();
-    }
-
-    public boolean isEmpty() {
-        return number == 0;
     }
 
     public void clear() {
@@ -104,21 +87,5 @@ public class Cell {
             case 2048 -> Color.rgb(237, 194, 46);
             default -> Color.rgb(60, 58, 50);
         };
-    }
-
-    // New method to resize for fullscreen
-    public void resizeForFullscreen(double x, double y, double size) {
-        // Update rectangle
-        rectangle.setX(x);
-        rectangle.setY(y);
-        rectangle.setWidth(size);
-        rectangle.setHeight(size);
-
-        // Update text position
-        text.setX(x + size / 2);
-        text.setY(y + size / 2);
-
-        // Update display to re-center text and update color
-        updateDisplay();
     }
 }
