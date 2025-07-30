@@ -1,6 +1,5 @@
 package com.example.demo.view;
 
-
 import com.example.demo.controller.SceneManager;
 import com.example.demo.model.Account;
 import javafx.scene.Group;
@@ -13,19 +12,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class AccountView {
-    private Group root;
+    private final Group root;
     private final SceneManager sceneManager;
     private final Account account;
-    private TextField usernameField;
-    private Button saveButton;
-    private Label errorLabel;
 
     public AccountView(SceneManager sceneManager, Account account) {
         System.out.println("Creating AccountView...");
         this.sceneManager = sceneManager;
         this.account = account;
         this.root = new Group();
-        System.out.println("AccountView root created: " + (root != null ? "NOT NULL" : "NULL"));
+        System.out.println("AccountView root created");
         setupAccountUI();
     }
 
@@ -54,7 +50,7 @@ public class AccountView {
         System.out.println("Title added. Children count: " + root.getChildren().size());
 
         // Username field with current username
-        usernameField = new TextField(account.getUserName());
+        TextField usernameField = new TextField(account.getUserName());
         usernameField.setFont(Font.font(24));
         usernameField.setLayoutX(300);
         usernameField.setLayoutY(200);
@@ -73,7 +69,7 @@ public class AccountView {
         System.out.println("Score added. Children count: " + root.getChildren().size());
 
         // Error label for displaying validation messages
-        errorLabel = new Label("");
+        Label errorLabel = new Label("");
         errorLabel.setFont(Font.font(18));
         errorLabel.setTextFill(Color.RED);
         errorLabel.setLayoutX(300);
@@ -83,8 +79,19 @@ public class AccountView {
         root.getChildren().add(errorLabel);
         System.out.println("Error label added. Children count: " + root.getChildren().size());
 
-        // Save button - MOVED to bottom of error label
-        saveButton = new Button("Save Username");
+        // Save button
+        Button saveButton = createSaveButton(usernameField, scoreLabel, errorLabel);
+        root.getChildren().add(saveButton);
+        System.out.println("Save button added. Children count: " + root.getChildren().size());
+
+        // Back button
+        Button backButton = createBackButton();
+        root.getChildren().add(backButton);
+        System.out.println("Back button added. Final children count: " + root.getChildren().size());
+    }
+
+    private Button createSaveButton(TextField usernameField, Label scoreLabel, Label errorLabel) {
+        Button saveButton = new Button("Save Username");
         saveButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
         saveButton.setLayoutX(350);
         saveButton.setLayoutY(400);  // Moved from 300 to 400 to be below error label
@@ -105,7 +112,7 @@ public class AccountView {
                     scoreLabel.setText("High Score: " + account.getScore());
                     Account.saveScores();  // Save to file
                     errorLabel.setText("");  // Clear error message
-                    showSuccessAlert("Username updated successfully!");
+                    showSuccessAlert();
                 } else {
                     errorLabel.setText("Username cannot be empty!");
                 }
@@ -113,10 +120,10 @@ public class AccountView {
                 errorLabel.setText(e.getMessage());
             }
         });
-        root.getChildren().add(saveButton);
-        System.out.println("Save button added. Children count: " + root.getChildren().size());
+        return saveButton;
+    }
 
-        // Back button - FIXED with proper error handling
+    private Button createBackButton() {
         Button backButton = new Button("Back to Menu");
         backButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
         backButton.setLayoutX(350);
@@ -128,26 +135,18 @@ public class AccountView {
                 sceneManager.showMainMenu();
             } catch (Exception e) {
                 System.err.println("Error switching to main menu: " + e.getMessage());
-                e.printStackTrace();
+                // Log the exception with more context
+                System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
             }
         });
-        root.getChildren().add(backButton);
-        System.out.println("Back button added. Final children count: " + root.getChildren().size());
+        return backButton;
     }
 
-    private void showSuccessAlert(String message) {
+    private void showSuccessAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");
         alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showErrorAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setContentText("Username updated successfully!");
         alert.showAndWait();
     }
 }

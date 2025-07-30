@@ -5,7 +5,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Screen;
@@ -39,7 +38,7 @@ public class Main extends Application {
 
     private void initializeApplication() {
         this.sceneManager = new SceneManager(primaryStage, this);
-        this.sceneManager.setupDefaultScenes();
+        // Removed: this.sceneManager.setupDefaultScenes();
     }
 
     public static void main(String[] args) {
@@ -66,13 +65,11 @@ public class Main extends Application {
         // Set up key event handlers
         gameScene.setOnKeyPressed(event -> {
             System.out.println("Key Pressed: " + event.getCode());
-
             // Handle ESC key to exit fullscreen
             if (event.getCode() == KeyCode.ESCAPE && isFullscreen) {
                 exitFullscreen();
                 return;
             }
-
             boolean moved = false;
             switch (event.getCode()) {
                 case UP -> moved = gameView.moveUp();
@@ -80,7 +77,6 @@ public class Main extends Application {
                 case LEFT -> moved = gameView.moveLeft();
                 case RIGHT -> moved = gameView.moveRight();
             }
-
             // Note: Animation handling is now inside GameView's move methods
         });
 
@@ -97,10 +93,8 @@ public class Main extends Application {
         });
 
         primaryStage.setScene(gameScene);
-
         // Enter fullscreen mode
         enterFullscreen();
-
         System.out.println("Game scene shown in fullscreen mode");
     }
 
@@ -108,7 +102,6 @@ public class Main extends Application {
         isFullscreen = true;
         primaryStage.setFullScreen(true);
         primaryStage.setFullScreenExitHint("Press ESC to exit fullscreen");
-
         // Adjust game view to fullscreen
         if (gameView != null) {
             Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
@@ -119,7 +112,6 @@ public class Main extends Application {
     private void exitFullscreen() {
         isFullscreen = false;
         primaryStage.setFullScreen(false);
-
         // Reset game view to original size
         if (gameView != null) {
             gameView.resetToOriginalSize();
