@@ -4,8 +4,6 @@ import javafx.application.Platform;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Screen;
 import javafx.geometry.Rectangle2D;
@@ -16,7 +14,6 @@ import com.example.demo.model.Account;
 public class Main extends Application {
     private static final int WINDOW_WIDTH = 900;
     private static final int WINDOW_HEIGHT = 900;
-    private static final Color DEFAULT_BACKGROUND_COLOR = Color.rgb(189, 177, 92);
     private Stage primaryStage;
     private SceneManager sceneManager;
     private GameView gameView;
@@ -32,13 +29,14 @@ public class Main extends Application {
             sceneManager.showMainMenu();
             this.primaryStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error starting application: " + e.getMessage());
+            // Log the exception with more context
+            System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
     private void initializeApplication() {
         this.sceneManager = new SceneManager(primaryStage, this);
-        // Removed: this.sceneManager.setupDefaultScenes();
     }
 
     public static void main(String[] args) {
@@ -51,10 +49,6 @@ public class Main extends Application {
 
     public static int getWindowHeight() {
         return WINDOW_HEIGHT;
-    }
-
-    public static Color getDefaultBackgroundColor() {
-        return DEFAULT_BACKGROUND_COLOR;
     }
 
     public void showGame() {
@@ -70,12 +64,12 @@ public class Main extends Application {
                 exitFullscreen();
                 return;
             }
-            boolean moved = false;
+
             switch (event.getCode()) {
-                case UP -> moved = gameView.moveUp();
-                case DOWN -> moved = gameView.moveDown();
-                case LEFT -> moved = gameView.moveLeft();
-                case RIGHT -> moved = gameView.moveRight();
+                case UP -> gameView.moveUp();
+                case DOWN -> gameView.moveDown();
+                case LEFT -> gameView.moveLeft();
+                case RIGHT -> gameView.moveRight();
             }
             // Note: Animation handling is now inside GameView's move methods
         });

@@ -36,6 +36,7 @@ https://github.com/ethanlim05/CW.git
 - Fixed fullscreen mode: Implemented proper fullscreen functionality that scales the game board appropriately.
 - Fixed tile positioning: Resolved issues where number boxes were appearing outside the grid boundaries.
 - Fixed text centering: Corrected problems where numbers were jumping outside their tiles during animations.
+- Code warnings: Fixed all code warnings related to unused fields, methods, imports, and variables.
 
 ## General Features
 - Smooth Animations: Implemented smooth animations for tile movements and merges without changing gameplay mechanics.
@@ -81,9 +82,6 @@ https://github.com/ethanlim05/CW.git
 | Class Name    | Path                                                        | Description                                                                                |
 |---------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | SceneManager  | src/main/java/com/example/demo/controller/SceneManager.java | Manages scene transitions between different views (main menu, game, account, leaderboard). |
-| GameConstants | src/main/java/com/example/demo/model/GameConstants.java     | Contains constants used throughout the game, such as window dimensions and cell sizes.     |
-| GameBoard     | src/main/java/com/example/demo/view/GameBoard.java          | Represents the game board and handles the visual representation of the grid.               |
-| ScoreDisplay  | src/main/java/com/example/demo/view/ScoreDisplay.java       | Displays the current score during gameplay.                                                |
 | AnimatedTile  | src/main/java/com/example/demo/view/AnimatedTile.java       | Handles the visual representation and animations of individual tiles.                      |
 
 # Modified Java Class
@@ -92,6 +90,8 @@ https://github.com/ethanlim05/CW.git
 - Added fullscreen functionality with enterFullscreen() and exitFullscreen() methods.
 - Modified showGame() to automatically enter fullscreen when starting the game.
 - Added ESC key handling to exit fullscreen mode.
+- Removed unused imports, constants, and methods to eliminate warnings.
+- Improved error handling with more robust logging.
 
 ## GameView.java
 - Increased cell size from 100 to 150 pixels for better visibility.
@@ -100,6 +100,8 @@ https://github.com/ethanlim05/CW.git
 - Implemented adjustToFullscreen() method to properly scale the game board in fullscreen mode.
 - Implemented resetToOriginalSize() method to return to normal windowed mode.
 - Moved the back button lower to prevent it from blocking the game board.
+- Fixed all code warnings by making fields final, removing unused variables, and improving error handling.
+- Extracted cell creation logic into a separate method for better code organization.
 
 ## Cell.java
 - Increased base font size from 24 to 36 points.
@@ -112,23 +114,35 @@ https://github.com/ethanlim05/CW.git
 - Enhanced setUsername() method with proper validation.
 - Improved error handling in saveScores() and loadScores() methods.
 - Added debug statements to track score saving and loading.
+- Made accounts field final and replaced printStackTrace() with more robust logging.
 
 ## AccountView.java
 - Added username validation to prevent duplicate usernames.
 - Enhanced error messaging for username validation.
 - Improved button positioning to prevent UI overlap.
+- Made fields final and extracted button creation methods to eliminate warnings.
+- Replaced printStackTrace() with more robust logging.
 
 ## LeaderboardView.java
 - Implemented proper sorting of accounts by score.
 - Added debug statements to track leaderboard loading and sorting.
 - Improved visual presentation of leaderboard entries.
+- Made fields final and extracted button creation methods to eliminate warnings.
+- Replaced printStackTrace() with more robust logging.
+
+## MainMenuView.java
+- Made root field final and removed redundant parameters to eliminate warnings.
+- Replaced statement lambdas with expression lambdas for more concise code.
+- Improved button creation with hover effects.
 
 ## Controller.java
 - Added ESC key handling for fullscreen mode.
 - Improved key event handling for better responsiveness.
+- Made fields final and removed unused parameters to eliminate warnings.
 - Simplified animation handling by moving animation logic to GameView.
 
 ## GameModel.java
+- Made board field final to eliminate warnings.
 - Enhanced game logic for better tile movement and merging.
 - Improved game state detection (win/lose conditions).
 - Added debug statements to track game state changes.
@@ -165,3 +179,7 @@ https://github.com/ethanlim05/CW.git
 - Solution: Created a new AnimatedTile class with proper animation handling and containment.
 - Implemented grid and cell-level clipping to ensure tiles stay within boundaries during animations.
 - Simplified the animation system to use basic transitions without complex translation calculations.
+
+## Code Quality Issues
+- Numerous Warnings: The codebase had many warnings related to unused fields, methods, imports, and variables.
+- Solution: Systematically went through each class to eliminate all warnings by making fields final, removing unused code, replacing printStackTrace() with proper logging, and improving code organization. This significantly improved code quality and maintainability.
