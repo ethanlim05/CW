@@ -9,12 +9,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-
 import com.example.demo.model.GameModel;
 import com.example.demo.model.Account;
 import com.example.demo.controller.SceneManager;
 import com.example.demo.Main;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,19 +24,17 @@ public class GameView extends Pane {
     private final Pane[][] cells = new Pane[GRID_SIZE][GRID_SIZE];
     private final AnimatedTile[][] tiles = new AnimatedTile[GRID_SIZE][GRID_SIZE];
     private long score = 0;
-    private boolean gameOver = false;
     private GameModel gameModel;
     private Label scoreLabel;
     private Button backButton;
-    private SceneManager sceneManager;
+    private final SceneManager sceneManager;
     private boolean isAnimating = false;
     private Pane gridContainer;
-
     // Store original dimensions for resetting
-    private double originalWidth;
-    private double originalHeight;
-    private double originalCellSize;
-    private double originalCellSpacing;
+    private final double originalWidth;
+    private final double originalHeight;
+    private final double originalCellSize;
+    private final double originalCellSpacing;
 
     public GameView(SceneManager sceneManager) {
         this.sceneManager = sceneManager;
@@ -46,7 +42,6 @@ public class GameView extends Pane {
         this.originalHeight = Main.getWindowHeight();
         this.originalCellSize = CELL_SIZE;
         this.originalCellSpacing = CELL_SPACING;
-
         setPrefSize(originalWidth, originalHeight);
         initializeGame();
     }
@@ -69,10 +64,9 @@ public class GameView extends Pane {
         double gridHeight = GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing;
 
         // Add padding to ensure tiles are fully visible
-        double padding = originalCellSpacing;
         double extraBottomPadding = originalCellSpacing * 5; // Further increased extra padding at the bottom
-        double paddedGridWidth = gridWidth + 2 * padding;
-        double paddedGridHeight = gridHeight + padding + extraBottomPadding; // Extra space at bottom
+        double paddedGridWidth = gridWidth + 2 * originalCellSpacing;
+        double paddedGridHeight = gridHeight + originalCellSpacing + extraBottomPadding; // Extra space at bottom
 
         // Center the grid with more space
         double startX = (originalWidth - paddedGridWidth) / 2;
@@ -88,7 +82,6 @@ public class GameView extends Pane {
         // Add clipping to ensure nothing appears outside the grid
         Rectangle clip = new Rectangle(0, 0, paddedGridWidth, paddedGridHeight);
         gridContainer.setClip(clip);
-
         this.getChildren().add(gridContainer);
 
         // Create background for the entire grid (now covers the entire padded area)
@@ -101,36 +94,42 @@ public class GameView extends Pane {
         // Create cell containers and tiles
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                double x = padding + col * (originalCellSize + originalCellSpacing);
-                double y = padding + row * (originalCellSize + originalCellSpacing);
-
-                // Create cell container
-                Pane cell = new Pane();
-                cell.setLayoutX(x);
-                cell.setLayoutY(y);
-                cell.setPrefSize(originalCellSize, originalCellSize);
-
-                // Add clipping to each cell to ensure tiles stay within
-                Rectangle cellClip = new Rectangle(0, 0, originalCellSize, originalCellSize);
-                cell.setClip(cellClip);
-
+                // Create cell container and add it to the grid
+                Pane cell = createCell(row, col, originalCellSize, originalCellSpacing);
                 cells[row][col] = cell;
                 gridContainer.getChildren().add(cell);
-
-                // Create cell background
-                Rectangle cellBg = new Rectangle(0, 0, originalCellSize, originalCellSize);
-                cellBg.setFill(Color.rgb(205, 193, 180));
-                cellBg.setArcWidth(10);
-                cellBg.setArcHeight(10);
-                cell.getChildren().add(cellBg);
-
-                // Create animated tile (initially hidden)
-                AnimatedTile tile = new AnimatedTile(originalCellSize);
-                tile.setVisible(false);
-                tiles[row][col] = tile;
-                cell.getChildren().add(tile);
             }
         }
+    }
+
+    private Pane createCell(int row, int col, double cellSize, double cellSpacing) {
+        double x = cellSpacing + col * (cellSize + cellSpacing);
+        double y = cellSpacing + row * (cellSize + cellSpacing);
+
+        // Create cell container
+        Pane cell = new Pane();
+        cell.setLayoutX(x);
+        cell.setLayoutY(y);
+        cell.setPrefSize(cellSize, cellSize);
+
+        // Add clipping to each cell to ensure tiles stay within
+        Rectangle cellClip = new Rectangle(0, 0, cellSize, cellSize);
+        cell.setClip(cellClip);
+
+        // Create cell background
+        Rectangle cellBg = new Rectangle(0, 0, cellSize, cellSize);
+        cellBg.setFill(Color.rgb(205, 193, 180));
+        cellBg.setArcWidth(10);
+        cellBg.setArcHeight(10);
+        cell.getChildren().add(cellBg);
+
+        // Create animated tile (initially hidden)
+        AnimatedTile tile = new AnimatedTile(cellSize);
+        tile.setVisible(false);
+        tiles[row][col] = tile;
+        cell.getChildren().add(tile);
+
+        return cell;
     }
 
     private void createScoreDisplay() {
@@ -157,7 +156,8 @@ public class GameView extends Pane {
                 sceneManager.showMainMenu();
             } catch (Exception e) {
                 System.err.println("Error switching to main menu: " + e.getMessage());
-                e.printStackTrace();
+                // Log the exception with more context
+                System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
             }
         });
         this.getChildren().add(backButton);
@@ -166,7 +166,6 @@ public class GameView extends Pane {
 
     public void updateBoard() {
         int[][] board = gameModel.getBoard();
-
         // Store current positions to detect movements
         List<TilePosition> oldPositions = new ArrayList<>();
         for (int row = 0; row < GRID_SIZE; row++) {
@@ -176,17 +175,14 @@ public class GameView extends Pane {
                 }
             }
         }
-
         // Update board with animations
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
                 int value = board[row][col];
-
                 if (value != 0) {
                     // Show and update the tile
                     tiles[row][col].setVisible(true);
                     tiles[row][col].setNumber(value);
-
                     // Animate new tiles
                     if (!wasTileAtPosition(oldPositions, row, col, value)) {
                         tiles[row][col].animateNewTile();
@@ -210,7 +206,6 @@ public class GameView extends Pane {
 
     private static class TilePosition {
         int row, col, value;
-
         TilePosition(int row, int col, int value) {
             this.row = row;
             this.col = col;
@@ -225,47 +220,42 @@ public class GameView extends Pane {
 
     public boolean moveUp() {
         if (isAnimating) return false;
-
         boolean moved = gameModel.moveUp();
         if (moved) {
-            animateMove("UP");
+            animateMove();
         }
         return moved;
     }
 
     public boolean moveDown() {
         if (isAnimating) return false;
-
         boolean moved = gameModel.moveDown();
         if (moved) {
-            animateMove("DOWN");
+            animateMove();
         }
         return moved;
     }
 
     public boolean moveLeft() {
         if (isAnimating) return false;
-
         boolean moved = gameModel.moveLeft();
         if (moved) {
-            animateMove("LEFT");
+            animateMove();
         }
         return moved;
     }
 
     public boolean moveRight() {
         if (isAnimating) return false;
-
         boolean moved = gameModel.moveRight();
         if (moved) {
-            animateMove("RIGHT");
+            animateMove();
         }
         return moved;
     }
 
-    private void animateMove(String direction) {
+    private void animateMove() {
         isAnimating = true;
-
         // Set a timer to mark animation as complete
         Timeline timeline = new Timeline(new KeyFrame(
                 Duration.millis(150),
@@ -292,10 +282,6 @@ public class GameView extends Pane {
             System.out.println("Game over!");
             showGameOverScreen("GAME OVER");
         }
-    }
-
-    public boolean isGameOver() {
-        return gameOver;
     }
 
     public void showGameOverScreen(String message) {
@@ -331,7 +317,8 @@ public class GameView extends Pane {
                 sceneManager.showMainMenu();
             } catch (Exception e) {
                 System.err.println("Error switching to main menu: " + e.getMessage());
-                e.printStackTrace();
+                // Log the exception with more context
+                System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
             }
         });
 
@@ -342,11 +329,9 @@ public class GameView extends Pane {
     // New method to adjust to fullscreen
     public void adjustToFullscreen(double screenWidth, double screenHeight) {
         // Calculate margins (3% of screen size - reduced for more space)
-        double marginX = screenWidth * 0.03;
         double marginY = screenHeight * 0.03;
 
         // Calculate available space
-        double availableWidth = screenWidth - 2 * marginX;
         double availableHeight = screenHeight - 2 * marginY;
 
         // Calculate maximum cell size that fits in available space
@@ -361,10 +346,9 @@ public class GameView extends Pane {
         double gridWidth = GRID_SIZE * cellSize + (GRID_SIZE - 1) * cellSpacing;
 
         // Add padding to ensure tiles are fully visible
-        double padding = cellSpacing;
         double extraBottomPadding = cellSpacing * 5; // Further increased extra padding at the bottom
-        double paddedGridWidth = gridWidth + 2 * padding;
-        double paddedGridHeight = boardHeight + padding + extraBottomPadding; // Extra space at bottom
+        double paddedGridWidth = gridWidth + 2 * cellSpacing;
+        double paddedGridHeight = boardHeight + cellSpacing + extraBottomPadding; // Extra space at bottom
 
         // Center the board
         double startX = (screenWidth - paddedGridWidth) / 2;
@@ -388,8 +372,8 @@ public class GameView extends Pane {
         // Update all cell containers and tiles
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                double x = padding + col * (cellSize + cellSpacing);
-                double y = padding + row * (cellSize + cellSpacing);
+                double x = cellSpacing + col * (cellSize + cellSpacing);
+                double y = cellSpacing + row * (cellSize + cellSpacing);
 
                 // Update cell container
                 cells[row][col].setLayoutX(x);
@@ -433,10 +417,9 @@ public class GameView extends Pane {
         double gridHeight = GRID_SIZE * originalCellSize + (GRID_SIZE - 1) * originalCellSpacing;
 
         // Add padding to ensure tiles are fully visible
-        double padding = originalCellSpacing;
         double extraBottomPadding = originalCellSpacing * 5; // Further increased extra padding at the bottom
-        double paddedGridWidth = gridWidth + 2 * padding;
-        double paddedGridHeight = gridHeight + padding + extraBottomPadding; // Extra space at bottom
+        double paddedGridWidth = gridWidth + 2 * originalCellSpacing;
+        double paddedGridHeight = gridHeight + originalCellSpacing + extraBottomPadding; // Extra space at bottom
 
         double startX = (originalWidth - paddedGridWidth) / 2;
         // Move grid down a bit to make room for top-left button
@@ -458,8 +441,8 @@ public class GameView extends Pane {
 
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                double x = padding + col * (originalCellSize + originalCellSpacing);
-                double y = padding + row * (originalCellSize + originalCellSpacing);
+                double x = originalCellSpacing + col * (originalCellSize + originalCellSpacing);
+                double y = originalCellSpacing + row * (originalCellSize + originalCellSpacing);
 
                 // Update cell container
                 cells[row][col].setLayoutX(x);
