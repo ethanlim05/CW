@@ -9,7 +9,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class MainMenuView {
-    private Group root = new Group();
+    private final Group root = new Group();
     private final SceneManager sceneManager;
 
     public MainMenuView(SceneManager sceneManager) {
@@ -23,7 +23,6 @@ public class MainMenuView {
 
     private void setupMainMenu() {
         System.out.println("=== Setting up Main Menu ===");
-
         // Clear existing children to ensure fresh UI
         root.getChildren().clear();
 
@@ -46,10 +45,10 @@ public class MainMenuView {
 
         // Create buttons
         System.out.println("Creating buttons...");
-        Button playButton = createButton("PLAY", 350, 300);
-        Button accountButton = createButton("ACCOUNT", 350, 400);
-        Button leaderboardButton = createButton("LEADERBOARD", 350, 500);
-        Button quitButton = createButton("QUIT", 350, 600);
+        Button playButton = createButton("PLAY", 300);
+        Button accountButton = createButton("ACCOUNT", 400);
+        Button leaderboardButton = createButton("LEADERBOARD", 500);
+        Button quitButton = createButton("QUIT", 600);
         System.out.println("Buttons created. Children count: " + root.getChildren().size());
 
         // Add button event handlers
@@ -60,21 +59,22 @@ public class MainMenuView {
         System.out.println("All buttons added. Final children count: " + root.getChildren().size());
     }
 
-    private Button createButton(String text, double x, double y) {
+    private Button createButton(String text, double y) {
         Button button = new Button(text);
         button.setPrefSize(200, 50);
         button.setFont(Font.font(20));
         button.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
-        button.setLayoutX(x);
+        button.setLayoutX(350); // Fixed x position for all buttons
         button.setLayoutY(y);
 
         // Add hover effect
-        button.setOnMouseEntered(event -> {
-            button.setStyle("-fx-background-color: #a98467; -fx-text-fill: white;");
-        });
-        button.setOnMouseExited(event -> {
-            button.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
-        });
+        button.setOnMouseEntered(event ->
+                button.setStyle("-fx-background-color: #a98467; -fx-text-fill: white;")
+        );
+
+        button.setOnMouseExited(event ->
+                button.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;")
+        );
 
         return button;
     }
