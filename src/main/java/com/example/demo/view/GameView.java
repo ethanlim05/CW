@@ -218,40 +218,32 @@ public class GameView extends Pane {
         scoreLabel.setText("SCORE: " + score);
     }
 
-    public boolean moveUp() {
-        if (isAnimating) return false;
-        boolean moved = gameModel.moveUp();
-        if (moved) {
+    public void moveUp() {
+        if (isAnimating) return;
+        if (gameModel.moveUp()) {
             animateMove();
         }
-        return moved;
     }
 
-    public boolean moveDown() {
-        if (isAnimating) return false;
-        boolean moved = gameModel.moveDown();
-        if (moved) {
+    public void moveDown() {
+        if (isAnimating) return;
+        if (gameModel.moveDown()) {
             animateMove();
         }
-        return moved;
     }
 
-    public boolean moveLeft() {
-        if (isAnimating) return false;
-        boolean moved = gameModel.moveLeft();
-        if (moved) {
+    public void moveLeft() {
+        if (isAnimating) return;
+        if (gameModel.moveLeft()) {
             animateMove();
         }
-        return moved;
     }
 
-    public boolean moveRight() {
-        if (isAnimating) return false;
-        boolean moved = gameModel.moveRight();
-        if (moved) {
+    public void moveRight() {
+        if (isAnimating) return;
+        if (gameModel.moveRight()) {
             animateMove();
         }
-        return moved;
     }
 
     private void animateMove() {
@@ -304,6 +296,7 @@ public class GameView extends Pane {
         menuButton.setFont(Font.font(26));
         menuButton.setLayoutX(getWidth() / 2 - 125);
         menuButton.setLayoutY(getHeight() / 2 + 50);
+
         menuButton.setOnAction(event -> {
             System.out.println("Menu button clicked from game over screen");
             try {
