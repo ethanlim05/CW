@@ -1,6 +1,5 @@
 package com.example.demo.view;
 
-
 import com.example.demo.controller.SceneManager;
 import com.example.demo.model.Account;
 import javafx.scene.Group;
@@ -9,18 +8,17 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-
-import java.util.Collections;
 import java.util.List;
+
 public class LeaderboardView {
-    private Group root;
+    private final Group root;
     private final SceneManager sceneManager;
 
     public LeaderboardView(SceneManager sceneManager) {
         System.out.println("Creating LeaderboardView...");
         this.sceneManager = sceneManager;
         this.root = new Group();
-        System.out.println("LeaderboardView root created: " + (root != null ? "NOT NULL" : "NULL"));
+        System.out.println("LeaderboardView root created");
         setupLeaderboardUI();
     }
 
@@ -51,7 +49,13 @@ public class LeaderboardView {
         // Load and display scores from Account class
         displayLeaderboardScores();
 
-        // Back button - FIXED
+        // Back button
+        Button backButton = createBackButton();
+        root.getChildren().add(backButton);
+        System.out.println("Back button added. Final children count: " + root.getChildren().size());
+    }
+
+    private Button createBackButton() {
         Button backButton = new Button("Back to Menu");
         backButton.setStyle("-fx-background-color: #8f7a66; -fx-text-fill: white;");
         backButton.setLayoutX(350);
@@ -63,11 +67,11 @@ public class LeaderboardView {
                 sceneManager.showMainMenu();
             } catch (Exception e) {
                 System.err.println("Error switching to main menu: " + e.getMessage());
-                e.printStackTrace();
+                // Log the exception with more context
+                System.err.println("Exception details: " + e.getClass().getName() + ": " + e.getMessage());
             }
         });
-        root.getChildren().add(backButton);
-        System.out.println("Back button added. Final children count: " + root.getChildren().size());
+        return backButton;
     }
 
     private void displayLeaderboardScores() {
@@ -81,7 +85,7 @@ public class LeaderboardView {
         }
 
         // Sort accounts by score (highest first)
-        Collections.sort(accounts, (a, b) -> Long.compare(b.getScore(), a.getScore()));
+        accounts.sort((a, b) -> Long.compare(b.getScore(), a.getScore()));
 
         // DEBUG: Print accounts after sorting
         System.out.println("DEBUG - Accounts after sorting:");
@@ -94,7 +98,6 @@ public class LeaderboardView {
         for (int i = 0; i < Math.min(accounts.size(), 10); i++) {  // Show top 10 scores
             Account account = accounts.get(i);
             String entry = (i + 1) + ". " + account.getUserName() + " - " + account.getScore();
-
             Label entryLabel = new Label(entry);
             entryLabel.setFont(Font.font(24));
             entryLabel.setTextFill(Color.WHITE);
