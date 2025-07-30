@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
@@ -8,7 +7,7 @@ import java.util.Arrays;  // Add this import for Arrays.equals()
 
 public class GameModel {
     private long score = 0;
-    private int[][] board = new int[4][4];
+    private final int[][] board = new int[4][4];
     private boolean gameOver = false;
 
     public GameModel() {
