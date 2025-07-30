@@ -7,36 +7,42 @@ import com.example.demo.model.GameModel;
 import com.example.demo.view.GameView;
 
 public class Controller {
-    private GameModel gameModel;
-    private GameView gameView;
-    private final SceneManager sceneManager;
+    private final GameModel gameModel;
+    private final GameView gameView;
+    private Scene scene;
 
-    public Controller(GameModel model, GameView view, SceneManager sceneManager) {
+    public Controller(GameModel model, GameView view) {
         this.gameModel = model;
         this.gameView = view;
-        this.sceneManager = sceneManager;
     }
 
-    public void setupEventHandlers(Scene scene) {
-        scene.setOnKeyPressed(this::handleKeyPress);
+    public void setScene(Scene scene) {
+        this.scene = scene;
+        setupEventHandlers();
+    }
+
+    private void setupEventHandlers() {
+        if (scene != null) {
+            scene.setOnKeyPressed(this::handleKeyPress);
+        }
     }
 
     private void handleKeyPress(KeyEvent event) {
         if (gameModel.isGameOver()) return;
 
         KeyCode code = event.getCode();
-        boolean moved = false;
 
         if (code == KeyCode.UP) {
-            moved = gameView.moveUp();
+            gameView.moveUp();
         } else if (code == KeyCode.DOWN) {
-            moved = gameView.moveDown();
+            gameView.moveDown();
         } else if (code == KeyCode.LEFT) {
-            moved = gameView.moveLeft();
+            gameView.moveLeft();
         } else if (code == KeyCode.RIGHT) {
-            moved = gameView.moveRight();
+            gameView.moveRight();
         }
 
-        // Note: Animation handling is now inside GameView's move methods
+        // Check game status after any move
+        gameView.checkGameStatus();
     }
 }
