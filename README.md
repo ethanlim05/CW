@@ -36,6 +36,8 @@ https://github.com/ethanlim05/CW.git
 - Fixed fullscreen mode: Implemented proper fullscreen functionality that scales the game board appropriately.
 - Fixed tile positioning: Resolved issues where number boxes were appearing outside the grid boundaries.
 - Fixed text centering: Corrected problems where numbers were jumping outside their tiles during animations.
+- Fixed unused method warnings in EndGame.java: Refactored the EndGame class to properly integrate with the game flow and eliminated the unused endGameShow method warning.
+- Fixed unused return values in GameView.java: Modified the move methods (moveUp, moveDown, moveLeft, moveRight) to return void instead of boolean, eliminating warnings about unused return values.
 - Code warnings: Fixed all code warnings related to unused fields, methods, imports, and variables.
 
 ## General Features
@@ -97,6 +99,7 @@ https://github.com/ethanlim05/CW.git
 - Increased cell size from 100 to 150 pixels for better visibility.
 - Increased cell spacing from 10 to 15 pixels.
 - Removed the top back button, keeping only the bottom one.
+- Modified move methods (moveUp, moveDown, moveLeft, moveRight) to return void instead of boolean, eliminating warnings about unused return values.
 - Implemented adjustToFullscreen() method to properly scale the game board in fullscreen mode.
 - Implemented resetToOriginalSize() method to return to normal windowed mode.
 - Moved the back button lower to prevent it from blocking the game board.
