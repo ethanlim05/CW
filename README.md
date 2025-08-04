@@ -17,7 +17,7 @@ https://github.com/ethanlim05/CW.git
 ## Setup
 1. Go to File > Project Structure or press Ctrl + Alt + Shift + S.
 2. In the Project Settings > Project section:
-    - Set the project SDK to 21 or greater.
+    - Set the project SDK to 24.
     - Set the language level as sdk default.
 3. In the Project Settings > Libraries section:
     - Add a new project library that points to the lib folder of the JavaFX SDK you installed.
